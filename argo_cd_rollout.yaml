@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: hello-server
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-server
+  template:
+    metadata:
+      labels:
+        app: hello-server
+    spec:
+      containers:
+      - name: hello-server
+        image: us-docker.pkg.dev/google-samples/containers/gke/hello-app:1.0
+        ports:
+        - containerPort: 8080
+  strategy:
+    blueGreen:
+      # The active service points production traffic to the new version after promotion
+      activeService: hello-server-active
+      # The preview service allows you to test the new version before switching traffic
+      previewService: hello-server-preview
+      # Set to false if you want to manually promote the rollout using `kubectl argo rollouts promote`
+      autoPromotionEnabled: false 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-server-active
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: hello-server
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-server-preview
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: hello-server
