@@ -1,6 +1,7 @@
 steps:
-  # 1. Build the Docker image using the Docker builder
+  # 1. Build the Docker image from inside the python_app directory
   - name: 'gcr.io/cloud-builders/docker'
+    dir: 'python_app'
     args:
       - 'build'
       - '-t'
@@ -32,12 +33,11 @@ steps:
       - '--platform=managed'
       - '--allow-unauthenticated'
 
-# Default substitution variables (can be overridden via CLI flags or Cloud Build Triggers)
 substitutions:
-  _LOCATION: 'us-central1'             # Your Artifact Registry region (e.g., us-central1)
-  _REPOSITORY: 'cloud-run-source-repo'   # Name of your existing Artifact Registry repo
-  _SERVICE_NAME: 'helloworld'          # Name of your Cloud Run service
-  _REGION: 'us-central1'               # Region where Cloud Run should host the service
+  _LOCATION: 'us-central1'             # Your GCP region
+  _REPOSITORY: 'ravi-repo'             # Your Artifact Registry repository name
+  _SERVICE_NAME: 'python-app'          # Your Cloud Run service name
+  _REGION: 'us-central1'
 
 images:
   - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$COMMIT_SHA'
