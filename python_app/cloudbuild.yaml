@@ -38,7 +38,7 @@ options:
 substitutions:
   _LOCATION: 'us-central1'             # Your GCP region
   _REPOSITORY: 'ravi-repo'             # Your Artifact Registry repository name
-  _SERVICE_NAME: 'python-app1'          # Your Cloud Run service name
+  _SERVICE_NAME: 'python-app2'          # Your Cloud Run service name
   _REGION: 'us-central1'
 
 images:
