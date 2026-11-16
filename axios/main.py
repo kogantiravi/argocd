@@ -4,6 +4,11 @@ import httpx
 app = FastAPI()
 client = httpx.AsyncClient()
 
+# Add this root route to prevent 404s on health checks or root visits
+@app.get("/")
+async def root_health_check():
+    return {"status": "healthy", "service": "axis-dynamic-proxy", "message": "Ready to proxy /t1 to /t100"}
+
 @app.api_route("/t{service_id}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
 async def dynamic_proxy(service_id: int, path: str, request: Request):
     # Enforce range check for t1 to t100
