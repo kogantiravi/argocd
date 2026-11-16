@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: axis-server-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: axis-server
+  template:
+    metadata:
+      labels:
+        app: axis-server
+    spec:
+      containers:
+      - name: axis-server
+        image: us-central1-docker.pkg.dev/pivotal-keep-513920-k5/ravi-repo/axios:latest
+        ports:
+        - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: axis-server-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: axis-server
+  ports:
+  - port: 80
+    targetPort: 8000
+---
+# --- DOWNSTREAM SERVICE 1 (Target for /t1) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-t1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-app-1
+  template:
+    metadata:
+      labels:
+        app: docker-app-1
+    spec:
+      containers:
+      - name: app-1
+        image: us-central1-docker.pkg.dev/pivotal-keep-513920-k5/ravi-repo/python-app1:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-t1   # Must match the DNS pattern expected by Axis code
+spec:
+  type: ClusterIP
+  selector:
+    app: docker-app-1
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+# --- DOWNSTREAM SERVICE 2 (Target for /t2) ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-t2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-app-2
+  template:
+    metadata:
+      labels:
+        app: docker-app-2
+    spec:
+      containers:
+      - name: app-2
+        image: us-central1-docker.pkg.dev/pivotal-keep-513920-k5/ravi-repo/python-app:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-t2   # Must match the DNS pattern expected by Axis code
+spec:
+  type: ClusterIP
+  selector:
+    app: docker-app-2
+  ports:
+  - port: 80
+    targetPort: 8080
