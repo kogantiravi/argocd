@@ -29,7 +29,7 @@ spec:
     matchLabels:
       app: mysql
   serviceName: "mysql"
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -59,3 +59,6 @@ spec:
         resources:
           requests:
             storage: 10Gi
+
+
+#kubectl run mysql-client --image=mysql:8.0 -it --rm --restart=Never -- mysql -h mysql -u root -p            
